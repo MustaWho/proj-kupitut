@@ -6,7 +6,9 @@ export type User = {
   username: string;
   first_name?: string | null;
   last_name?: string | null;
+  avatar_url?: string | null;
   role: UserRole;
+  is_active: boolean;
 };
 
 export type Category = {
@@ -21,6 +23,11 @@ export type Review = {
   rating: number;
   text: string;
   created_at: string;
+  user?: {
+    id: number;
+    username: string;
+    avatar_url?: string | null;
+  } | null;
 };
 
 export type Product = {
@@ -48,6 +55,29 @@ export type Promotion = {
   is_active: boolean;
   product_id?: number | null;
   category_id?: number | null;
+};
+
+export type Sale = {
+  order_id: number;
+  order_item_id: number;
+  product: {
+    id: number;
+    name: string;
+  };
+  buyer: {
+    id: number;
+    username: string;
+    email: string;
+  };
+  seller?: {
+    id: number;
+    username: string;
+    email: string;
+  } | null;
+  quantity: number;
+  unit_price: string;
+  total_price: string;
+  sold_at: string;
 };
 
 export type CartLine = {

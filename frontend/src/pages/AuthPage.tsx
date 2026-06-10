@@ -5,9 +5,9 @@ import type { UserRole } from "../types";
 
 export function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("buyer@example.com");
-  const [username, setUsername] = useState("buyer");
-  const [password, setPassword] = useState("secret123");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("user");
   const [error, setError] = useState<string | null>(null);
   const auth = useAuth();
@@ -48,6 +48,7 @@ export function AuthPage() {
           <>
             <input
               aria-label="Электронная почта"
+              placeholder="Электронная почта"
               value={email}
               type="email"
               onChange={(event) => setEmail(event.target.value)}

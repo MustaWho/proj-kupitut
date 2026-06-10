@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     access_token_seconds: int = Field(default=3600, ge=60)
     refresh_token_seconds: int = Field(default=604800, ge=3600)
     cors_origins: str = "http://localhost:5173,http://localhost:3000,http://localhost:8080"
+    media_dir: str = "media"
 
 
 @lru_cache

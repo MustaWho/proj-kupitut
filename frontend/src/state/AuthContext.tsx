@@ -16,6 +16,7 @@ type AuthState = {
     first_name?: string;
     last_name?: string;
   }) => Promise<void>;
+  updateUser: (user: User) => void;
   logout: () => void;
 };
 
@@ -46,6 +47,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       async register(payload) {
         const next = toState(await api.register(payload));
+        setAuth(next);
+        saveAuth(next);
+      },
+      updateUser(user) {
+        if (!auth) return;
+        const next = { ...auth, user };
         setAuth(next);
         saveAuth(next);
       },

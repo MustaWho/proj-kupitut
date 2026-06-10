@@ -55,6 +55,10 @@ class UserService:
 
         return user_crud.update(self.db, user, values)
 
+    async def update_avatar(self, user_id: int, avatar_url: str) -> User:
+        user = await self.get_user(user_id)
+        return user_crud.update(self.db, user, {"avatar_url": avatar_url})
+
     async def delete_user(self, user_id: int) -> None:
         user = await self.get_user(user_id)
         user_crud.delete(self.db, user)

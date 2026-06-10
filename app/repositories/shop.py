@@ -6,9 +6,11 @@ from sqlalchemy.orm import Session, selectinload
 from app.models import (
     CartItem,
     Category,
+    Order,
     Product,
     ProductView,
     Promotion,
+    OrderItem,
     Review,
 )
 
@@ -36,7 +38,10 @@ class ShopCRUD:
         return db.scalar(
             select(Product)
             .where(Product.id == product_id)
-            .options(selectinload(Product.category), selectinload(Product.reviews))
+            .options(
+                selectinload(Product.category),
+                selectinload(Product.reviews).selectinload(Review.user),
+            )
         )
 
     def list_products(
@@ -53,7 +58,7 @@ class ShopCRUD:
     ) -> list[Product]:
         query = select(Product).options(
             selectinload(Product.category),
-            selectinload(Product.reviews),
+            selectinload(Product.reviews).selectinload(Review.user),
         )
         if category_id is not None:
             query = query.where(Product.category_id == category_id)
@@ -122,7 +127,7 @@ class ShopCRUD:
         viewed_ids = self.viewed_product_ids(db, user_id)
         query = select(Product).options(
             selectinload(Product.category),
-            selectinload(Product.reviews),
+            selectinload(Product.reviews).selectinload(Review.user),
         )
         if category_ids:
             query = query.where(Product.category_id.in_(category_ids))
@@ -137,7 +142,9 @@ class ShopCRUD:
             .where(CartItem.id == item_id)
             .options(
                 selectinload(CartItem.product).selectinload(Product.category),
-                selectinload(CartItem.product).selectinload(Product.reviews),
+                selectinload(CartItem.product)
+                .selectinload(Product.reviews)
+                .selectinload(Review.user),
             )
         )
 
@@ -164,7 +171,9 @@ class ShopCRUD:
             .where(CartItem.user_id == user_id)
             .options(
                 selectinload(CartItem.product).selectinload(Product.category),
-                selectinload(CartItem.product).selectinload(Product.reviews),
+                selectinload(CartItem.product)
+                .selectinload(Product.reviews)
+                .selectinload(Review.user),
             )
         )
         if product_id is not None:
@@ -180,6 +189,19 @@ class ShopCRUD:
     def delete_cart_item(self, db: Session, item: CartItem) -> None:
         db.delete(item)
         db.commit()
+
+    def list_order_items(self, db: Session, limit: int = 100) -> list[OrderItem]:
+        query = (
+            select(OrderItem)
+            .options(
+                selectinload(OrderItem.order),
+                selectinload(OrderItem.order).selectinload(Order.user),
+                selectinload(OrderItem.product).selectinload(Product.seller),
+            )
+            .order_by(OrderItem.id.desc())
+            .limit(limit)
+        )
+        return list(db.scalars(query))
 
     def list_promotions(
         self, db: Session, active_only: bool = False, offset: int = 0, limit: int = 100

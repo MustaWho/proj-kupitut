@@ -52,6 +52,14 @@ class ProductUpdate(ORMBaseModel):
     seller_id: int | None = Field(default=None, gt=0)
 
 
+class ReviewUserRead(ORMBaseModel):
+    """Public review author fields."""
+
+    id: int
+    username: str
+    avatar_url: str | None = None
+
+
 class ReviewRead(ORMBaseModel):
     """Product review response."""
 
@@ -61,6 +69,7 @@ class ReviewRead(ORMBaseModel):
     rating: int
     text: str
     created_at: datetime
+    user: ReviewUserRead | None = None
 
 
 class ProductRead(ProductBase):
@@ -142,6 +151,35 @@ class OrderRead(ORMBaseModel):
     status: str
     items: list[OrderItemRead]
     created_at: datetime
+
+
+class SaleUserRead(ORMBaseModel):
+    """Short user data for sales history."""
+
+    id: int
+    username: str
+    email: str
+
+
+class SaleProductRead(ORMBaseModel):
+    """Short product data for sales history."""
+
+    id: int
+    name: str
+
+
+class SaleRead(ORMBaseModel):
+    """Sold product history line."""
+
+    order_id: int
+    order_item_id: int
+    product: SaleProductRead
+    buyer: SaleUserRead
+    seller: SaleUserRead | None = None
+    quantity: int
+    unit_price: Decimal
+    total_price: Decimal
+    sold_at: datetime
 
 
 class ProductViewCreate(ORMBaseModel):

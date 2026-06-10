@@ -1,10 +1,12 @@
 ﻿"""FastAPI application entrypoint."""
 
 import logging
+from pathlib import Path
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.controllers import health
@@ -56,6 +58,9 @@ def create_app() -> FastAPI:
         return await call_next(request)
 
     register_exception_handlers(app)
+    media_root = Path(settings.media_dir)
+    media_root.mkdir(parents=True, exist_ok=True)
+    app.mount("/media", StaticFiles(directory=media_root), name="media")
     app.include_router(api_router, prefix=settings.api_v1_prefix)
     app.include_router(health.router, prefix="/api")
 

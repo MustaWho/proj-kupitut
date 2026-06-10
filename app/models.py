@@ -32,6 +32,7 @@ class User(IdMixin, TimestampMixin, Base):
     first_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
     role: Mapped[str] = mapped_column(String(20), default="user", nullable=False)
+    avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     projects: Mapped[list["Project"]] = relationship(
         back_populates="owner",

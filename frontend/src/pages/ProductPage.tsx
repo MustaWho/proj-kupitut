@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { ShoppingCart, Star } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Edit, ShoppingCart, Star, Trash2 } from "lucide-react";
 import { api } from "../api/client";
 import { ErrorMessage, Loading } from "../components/Status";
 import { useAuth } from "../state/AuthContext";
@@ -17,7 +17,10 @@ export function ProductPage() {
   const [rating, setRating] = useState(5);
   const auth = useAuth();
   const cart = useCart();
+  const navigate = useNavigate();
   const id = Number(productId);
+  const canSeeProductId = auth.user?.role === "seller" || auth.user?.role === "admin";
+  const isAdmin = auth.user?.role === "admin";
 
   useEffect(() => {
     setLoading(true);
@@ -48,6 +51,12 @@ export function ProductPage() {
     setProduct(await api.getProduct(product.id));
   }
 
+  async function deleteProduct() {
+    if (!product || !isAdmin) return;
+    await api.deleteProduct(product.id);
+    navigate("/catalog");
+  }
+
   if (loading) return <Loading />;
   if (error && !product) return <ErrorMessage message={error} />;
   if (!product) return <ErrorMessage message="Товар не найден" />;
@@ -60,6 +69,7 @@ export function ProductPage() {
       </div>
       <div className="product-detail">
         <span className="pill">{product.category.name}</span>
+        {canSeeProductId && <span className="product-id">ID товара: {product.id}</span>}
         <h1>{product.name}</h1>
         <p>{product.description ?? "Подробное описание появится позже."}</p>
         <div className="detail-row">
@@ -78,6 +88,18 @@ export function ProductPage() {
           <ShoppingCart aria-hidden="true" />
           В корзину
         </button>
+        {isAdmin && (
+          <div className="admin-product-actions">
+            <Link className="button secondary" to={`/admin?productId=${product.id}`}>
+              <Edit aria-hidden="true" />
+              Изменить
+            </Link>
+            <button className="button danger" type="button" onClick={() => void deleteProduct()}>
+              <Trash2 aria-hidden="true" />
+              Удалить
+            </button>
+          </div>
+        )}
       </div>
       <section className="reviews">
         <h2>Отзывы</h2>
@@ -102,7 +124,19 @@ export function ProductPage() {
         {error && <ErrorMessage message={error} />}
         {product.reviews.map((review) => (
           <article className="review" key={review.id}>
-            <strong>{review.rating}/5</strong>
+            <div className="review-author">
+              <div className="avatar-small">
+                {review.user?.avatar_url ? (
+                  <img src={review.user.avatar_url} alt={review.user.username} />
+                ) : (
+                  (review.user?.username ?? "П").slice(0, 1).toUpperCase()
+                )}
+              </div>
+              <div>
+                <strong>{review.user?.username ?? `Пользователь ${review.user_id}`}</strong>
+                <span>{review.rating}/5</span>
+              </div>
+            </div>
             <p>{review.text}</p>
           </article>
         ))}

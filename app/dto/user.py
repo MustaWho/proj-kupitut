@@ -14,6 +14,7 @@ class UserBase(ORMBaseModel):
     username: str = Field(min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$")
     first_name: str | None = Field(default=None, max_length=80)
     last_name: str | None = Field(default=None, max_length=80)
+    avatar_url: str | None = Field(default=None, max_length=500)
 
     @field_validator("username")
     @classmethod

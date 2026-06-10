@@ -1,14 +1,17 @@
 ﻿"""User endpoints."""
 
 from typing import Annotated
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.controllers.dependencies import get_db
 from app.models import User
 from app.dto.user import UserCreate, UserRead, UserUpdate
 from app.services.user_service import UserService
+from app.utils.images import save_replaced_image
 
 router = APIRouter()
 
@@ -47,6 +50,26 @@ async def update_user(
     """Update a user."""
 
     return await UserService(db).update_user(user_id, payload)
+
+
+@router.post("/{user_id}/avatar", response_model=UserRead)
+async def upload_avatar(
+    user_id: int,
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+) -> User:
+    """Upload or replace a user's avatar image."""
+
+    service = UserService(db)
+    await service.get_user(user_id)
+    avatar_url = save_replaced_image(
+        content=await request.body(),
+        content_type=request.headers.get("content-type"),
+        directory=Path(settings.media_dir) / "avatars",
+        file_stem=f"user_{user_id}",
+        public_prefix="/media/avatars",
+    )
+    return await service.update_avatar(user_id, avatar_url)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

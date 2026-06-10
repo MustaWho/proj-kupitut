@@ -1,11 +1,13 @@
 """Shop endpoints."""
 
 from decimal import Decimal
+from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.controllers.dependencies import get_db
 from app.dto.shop import (
     CartItemCreate,
@@ -25,9 +27,11 @@ from app.dto.shop import (
     PromotionUpdate,
     ReviewCreate,
     ReviewRead,
+    SaleRead,
 )
 from app.models import CartItem, Category, Order, Product, Promotion, Review
 from app.services.shop_service import ShopService
+from app.utils.images import save_replaced_image
 
 router = APIRouter()
 
@@ -101,6 +105,27 @@ async def update_product(
     """Update a product."""
 
     return await ShopService(db).update_product(product_id, payload)
+
+
+@router.post("/products/{product_id}/image", response_model=ProductRead)
+async def upload_product_image(
+    product_id: int,
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    user_id: Annotated[int, Query(gt=0)],
+) -> Product:
+    """Upload or replace a product image."""
+
+    service = ShopService(db)
+    await service.ensure_product_image_access(product_id, user_id)
+    image_url = save_replaced_image(
+        content=await request.body(),
+        content_type=request.headers.get("content-type"),
+        directory=Path(settings.media_dir) / "products",
+        file_stem=f"product_{product_id}",
+        public_prefix="/media/products",
+    )
+    return await service.update_product_image(product_id, user_id, image_url)
 
 
 @router.delete("/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -219,6 +244,30 @@ async def checkout(
     """Create an order from the user's cart."""
 
     return await ShopService(db).checkout(user_id, payload)
+
+
+@router.get("/sales", response_model=list[SaleRead])
+async def list_sales(
+    db: Annotated[Session, Depends(get_db)],
+    limit: Annotated[int, Query(ge=1, le=500)] = 100,
+) -> list[dict[str, object]]:
+    """List sold product history for the admin panel."""
+
+    rows = await ShopService(db).list_sales(limit=limit)
+    return [
+        {
+            "order_id": item.order_id,
+            "order_item_id": item.id,
+            "product": item.product,
+            "buyer": item.order.user,
+            "seller": item.product.seller,
+            "quantity": item.quantity,
+            "unit_price": item.unit_price,
+            "total_price": item.unit_price * item.quantity,
+            "sold_at": item.order.created_at,
+        }
+        for item in rows
+    ]
 
 
 @router.get("/promotions", response_model=list[PromotionRead])

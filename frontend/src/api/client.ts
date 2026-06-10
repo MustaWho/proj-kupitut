@@ -1,4 +1,13 @@
-import type { AuthResponse, Category, Product, ProductFilters, Promotion, UserRole } from "../types";
+import type {
+  AuthResponse,
+  Category,
+  Product,
+  ProductFilters,
+  Promotion,
+  Sale,
+  User,
+  UserRole
+} from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api/v1";
 
@@ -37,6 +46,33 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return response.json() as Promise<T>;
 }
 
+async function uploadFile<T>(path: string, file: File, query?: RequestOptions["query"]): Promise<T> {
+  const url = new URL(`${API_URL}${path}`, window.location.origin);
+  Object.entries(query ?? {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") {
+      url.searchParams.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": file.type || "application/octet-stream"
+    },
+    body: file
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const validationMessage = Array.isArray(body?.detail)
+      ? body.detail.map((item: { msg?: string }) => item.msg).join("; ")
+      : null;
+    throw new Error(body?.error?.message ?? validationMessage ?? "Не удалось загрузить файл");
+  }
+
+  return response.json() as Promise<T>;
+}
+
 export const api = {
   register(payload: {
     email: string;
@@ -54,6 +90,18 @@ export const api = {
   login(payload: { login: string; password: string }) {
     return request<AuthResponse>("/auth/login", {
       method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+  listUsers() {
+    return request<User[]>("/users");
+  },
+  getUser(userId: number) {
+    return request<User>(`/users/${userId}`);
+  },
+  updateUser(userId: number, payload: Partial<User>) {
+    return request<User>(`/users/${userId}`, {
+      method: "PATCH",
       body: JSON.stringify(payload)
     });
   },
@@ -104,6 +152,12 @@ export const api = {
   deleteProduct(productId: number) {
     return request<void>(`/products/${productId}`, { method: "DELETE" });
   },
+  uploadProductImage(productId: number, userId: number, file: File) {
+    return uploadFile<Product>(`/products/${productId}/image`, file, { user_id: userId });
+  },
+  uploadAvatar(userId: number, file: File) {
+    return uploadFile<User>(`/users/${userId}/avatar`, file);
+  },
   createReview(productId: number, payload: { user_id: number; rating: number; text: string }) {
     return request(`/products/${productId}/reviews`, {
       method: "POST",
@@ -141,5 +195,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload)
     });
+  },
+  listSales() {
+    return request<Sale[]>("/sales");
   }
 };

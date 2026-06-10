@@ -24,6 +24,11 @@ frontend/node_modules/
 frontend/.npm-cache/
 frontend/dist/
 frontend/coverage/
+*.tsbuildinfo
+media/avatars/*
+media/products/*
+!media/avatars/.gitkeep
+!media/products/.gitkeep
 *.egg-info/
 .DS_Store
 desktop.ini

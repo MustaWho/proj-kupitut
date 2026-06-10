@@ -81,6 +81,17 @@ class ShopService:
             self._ensure_seller(int(values["seller_id"]))
         return shop_crud.update_product(self.db, product, values)
 
+    async def update_product_image(self, product_id: int, user_id: int, image_url: str) -> Product:
+        await self.ensure_product_image_access(product_id, user_id)
+        product = await self.get_product(product_id)
+        return shop_crud.update_product(self.db, product, {"image_url": image_url})
+
+    async def ensure_product_image_access(self, product_id: int, user_id: int) -> None:
+        product = await self.get_product(product_id)
+        user = self._ensure_seller(user_id)
+        if user.role != "admin" and product.seller_id != user.id:
+            raise BadRequestError("Продавец может менять изображение только у своих товаров")
+
     async def delete_product(self, product_id: int) -> None:
         product = await self.get_product(product_id)
         shop_crud.delete_product(self.db, product)
@@ -183,6 +194,9 @@ class ShopService:
         self.db.commit()
         self.db.refresh(order)
         return order
+
+    async def list_sales(self, limit: int = 100) -> list[OrderItem]:
+        return shop_crud.list_order_items(self.db, limit=limit)
 
     async def list_promotions(
         self, active_only: bool = False, offset: int = 0, limit: int = 100
