@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Предпросмотр интернет-магазина</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#">
+          <span>▣</span>
+          КупиТут
+        </a>
+        <nav class="nav">
+          <a class="active" href="#">Каталог</a>
+          <a href="#">Кабинет</a>
+          <a href="#">Управление</a>
+        </nav>
+        <div class="topbar-actions">
+          <a class="cart-link" href="#">
+            <span>Корзина</span>
+            <span>2</span>
+          </a>
+          <a class="button secondary" href="#">Войти</a>
+        </div>
+      </header>
+
+      <main>
+        <section class="home-page">
+          <div class="hero">
+            <div>
+              <h1>КупиТут</h1>
+              <p>Маркетплейс для покупателей, продавцов и администраторов.</p>
+            </div>
+            <a class="button" href="#">Перейти в каталог</a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-title">
+          <h2>Товары по акции</h2>
+            <a href="#">Все товары</a>
+          </div>
+          <div class="promo-grid">
+            <article class="promo-card">
+              <strong>-15%</strong>
+              <h3>Летняя распродажа</h3>
+              <p>Специальное предложение интернет-магазина.</p>
+            </article>
+            <article class="promo-card">
+              <strong>-20%</strong>
+              <h3>Товары недели</h3>
+              <p>Скидки на популярные категории каталога.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="page">
+          <div class="section-title">
+            <h1>Каталог</h1>
+            <span>3 товара</span>
+          </div>
+          <form class="filters">
+            <input placeholder="Поиск по товарам" />
+            <select>
+              <option>Все категории</option>
+            </select>
+            <input placeholder="Цена от" />
+            <input placeholder="Цена до" />
+            <select>
+              <option>Любой рейтинг</option>
+            </select>
+          </form>
+          <div class="product-grid">
+            <article class="product-card">
+              <a class="product-media" href="#"><span>Электроника</span></a>
+              <div class="product-body">
+                <div>
+                  <a class="product-title" href="#">Беспроводные наушники</a>
+                  <p>Описание товара будет добавлено позже.</p>
+                </div>
+                <div class="product-footer">
+                  <strong>7 990 ₽</strong>
+                  <span>9 990 ₽</span>
+                  <span class="rating">★ 4.8</span>
+                  <button class="icon-button">+</button>
+                </div>
+              </div>
+            </article>
+            <article class="product-card">
+              <a class="product-media" href="#"><span>Дом</span></a>
+              <div class="product-body">
+                <div>
+                  <a class="product-title" href="#">Умная лампа</a>
+                  <p>Мягкий свет, управление со смартфона, несколько сценариев.</p>
+                </div>
+                <div class="product-footer">
+                  <strong>2 490 ₽</strong>
+                  <span class="rating">★ 4.6</span>
+                  <button class="icon-button">+</button>
+                </div>
+              </div>
+            </article>
+            <article class="product-card">
+              <a class="product-media" href="#"><span>Книги</span></a>
+              <div class="product-body">
+                <div>
+                  <a class="product-title" href="#">Ежедневник</a>
+                  <p>Плотная бумага, лаконичная обложка, удобная сетка страниц.</p>
+                </div>
+                <div class="product-footer">
+                  <strong>790 ₽</strong>
+                  <span class="rating">★ 4.4</span>
+                  <button class="icon-button">+</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
