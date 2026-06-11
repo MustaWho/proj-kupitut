@@ -45,7 +45,6 @@ export function HomePage() {
       <section className="section">
         <div className="section-title">
           <h2>Популярные товары</h2>
-          <span>Плитка до 4 строк</span>
         </div>
         <div className="product-grid home-products">
           {regularProducts.map((product) => (

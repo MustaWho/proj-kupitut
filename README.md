@@ -105,6 +105,24 @@ docker compose up -d --build
 - Swagger API: http://localhost:8000/docs
 - Проверка состояния API: http://localhost:8000/api/v1/health
 
+Создать тестовых пользователей и товары:
+
+```bash
+docker compose exec api python -m app.seed_demo
+```
+
+Будут созданы аккаунты:
+
+- `admin@kupitut-shop.ru` / `admin`
+- `buyer@kupitut-shop.ru` / `buyer`
+- `seller@kupitut-shop.ru` / `seller`
+
+Пароль для всех тестовых аккаунтов:
+
+```text
+secret999
+```
+
 Остановить проект:
 
 ```bash
@@ -119,6 +137,7 @@ python -m venv .venv
 pip install -r requirements.txt
 set DATABASE_URL=sqlite+pysqlite:///./dev.db
 python -m alembic upgrade head
+python -m app.seed_demo
 uvicorn app.main:app --reload
 ```
 

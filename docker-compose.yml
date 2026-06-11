@@ -27,6 +27,8 @@ services:
       DATABASE_URL: postgresql+psycopg://projr:projr@db:5432/projr
     ports:
       - "8000:8000"
+    volumes:
+      - ./media:/app/media
     depends_on:
       db:
         condition: service_healthy
