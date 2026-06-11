@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: /api/v1
+        NODE_IMAGE: public.ecr.aws/docker/library/node:20-alpine
+        NGINX_IMAGE: public.ecr.aws/docker/library/nginx:1.27-alpine
     container_name: shop-frontend
     ports:
       - "8080:80"
@@ -16,6 +18,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      args:
+        PYTHON_IMAGE: public.ecr.aws/docker/library/python:3.11-slim
     container_name: shop-api
     env_file:
       - .env.example
@@ -29,7 +33,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:15-alpine
+    image: public.ecr.aws/docker/library/postgres:15-alpine
     container_name: shop-db
     environment:
       POSTGRES_DB: projr
