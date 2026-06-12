@@ -99,19 +99,16 @@ React UI -> frontend/src/api/client.ts -> FastAPI controllers -> services -> rep
 docker compose up -d --build
 ```
 
-После запуска:
+После запуска автоматически применяются миграции и создаются тестовые пользователи, категории и товары.
+Каталог будет заполнен сразу после `docker compose up -d --build`.
+
+Доступные адреса:
 
 - Фронтенд: http://localhost:8080
 - Swagger API: http://localhost:8000/docs
 - Проверка состояния API: http://localhost:8000/api/v1/health
 
-Создать тестовых пользователей и товары:
-
-```bash
-docker compose exec api python -m app.seed_demo
-```
-
-Будут созданы аккаунты:
+Тестовые аккаунты:
 
 - `admin@kupitut-shop.ru` / `admin`
 - `buyer@kupitut-shop.ru` / `buyer`
